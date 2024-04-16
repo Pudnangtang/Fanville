@@ -13,51 +13,28 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI dialogueText;
     [SerializeField] private TextMeshProUGUI displayNameText;
 
-    // Add a way to hold quest data that could come from the dialogue or an external source
-    [Header("Quest Data")]
-    [SerializeField] private string questTitle; // Set these in the Inspector or dynamically via code
-    [SerializeField] private string questDescription;
-
-    [Header("Quest UI")]
-    [SerializeField] private TextMeshProUGUI questTitleText; // Reference to the title TextMeshProUGUI component
-    [SerializeField] private TextMeshProUGUI questDescriptionText; // Reference to the description TextMeshProUGUI component
-    [SerializeField] private GameObject questLogPanel; // Reference to the quest log panel
-
     [Header("Choices UI")]
     [SerializeField] private Button[] choiceButtons;
     private TextMeshProUGUI[] choicesText;
 
     [Header("Typing Effect")]
-    [SerializeField] private float typingSpeed = 0.05f;
     private Coroutine typingCoroutine;
 
-    [Header("Voice")]
-    [SerializeField] private AudioSource audioSource;
-    [SerializeField] private AudioClip[] voiceClips;
-    [SerializeField] private float voicePitch = 1.0f;
-    [SerializeField] private float beepFrequency = 1.0f;
-
-    [Header("Player Control")]
+    [Header("Player Controls")]
     [SerializeField] private PlayerController playerController;
 
-    [Header("Ink JSON")]
-    [SerializeField] private TextAsset inkJSONAsset; // Add this line
-
     [SerializeField] private bool stopAudioSource;
-
-    public QuestManager currentQuest;
-
 
     public bool ifSetUpStory = false;  // To determine if the story is set up or not
 
     private const string SPEAKER_TAG = "speaker";
-    private const string PORTRAIT_TAG = "portrait";
-    private const string LAYOUT_TAG = "layout";
 
     private Story currentStory;
+
+    [SerializeField] private AudioSource audioSource;
     public bool dialogueIsPlaying { get; private set; }
 
-    private bool isTyping; // New field to track typing state
+    private bool isTyping; 
 
     private bool isWaitingForChoiceToBeMade = false;
 
@@ -154,94 +131,13 @@ public class DialogueManager : MonoBehaviour
         }
         return currentStory;
     }
-
-
-    private void StartQuest(QuestManager quest)
-    {
-        if (quest == null)
-        {
-            Debug.LogError("Attempted to start a null quest.");
-            return;
-        }
-
-        // Set the quest details and activate the quest
-        quest.title = questTitle;
-        quest.description = questDescription;
-        quest.ActivateQuest(); // Activate the quest
-
-        currentQuest = quest;
-
-        // Update the quest UI
-        UpdateQuestUIOnStart(quest);
-    }
-
-
-    private void UpdateQuestUIOnStart(QuestManager quest)
-    {
-        if (questTitleText != null && questDescriptionText != null && questLogPanel != null)
-        {
-            questTitleText.text = quest.title;
-            questDescriptionText.text = quest.description;
-            questLogPanel.SetActive(true); // Show the quest log panel
-        }
-        else
-        {
-            Debug.LogError("Quest UI components are not assigned!");
-        }
-    }
-
-    private void UpdateQuestUIOnCompletion(QuestManager quest)
-    {
-        // Check if the quest log UI components are assigned
-        if (questTitleText == null || questDescriptionText == null || questLogPanel == null)
-        {
-            Debug.LogError("Quest UI components are not assigned!");
-            return;
-        }
-
-        // Optionally, update the text to indicate completion
-        questTitleText.text = "Quest Completed: " + quest.title;
-        questDescriptionText.text = "You have successfully completed the quest.";
-
-        // If you want to hide the quest log panel after some time
-        StartCoroutine(HideQuestLogAfterDelay());
-
-        // Alternatively, you could simply deactivate the quest log panel immediately
-        // questLogPanel.SetActive(false);
-    }
-
-    // Coroutine to hide the quest log panel after a delay
-    private IEnumerator HideQuestLogAfterDelay()
-    {
-        // Wait for a few seconds before hiding the quest log panel
-        yield return new WaitForSeconds(5.0f);
-        questLogPanel.SetActive(false);
-    }
-
-
-    //Additional logic for during quest
-
-    public void CompleteQuest()
-    {
-        if (currentQuest != null && !currentQuest.isCompleted)
-        {
-            currentQuest.CompleteQuest();
-            Debug.Log("Quest Complete");
-            UpdateQuestUIOnCompletion(currentQuest); // Add this line
-            // Additional logic for when the quest is completed
-        }
-    }
-
+  
     // Call this to refresh the dialogue choices after an update in the story's state
     public void RefreshDialogueUI()
     {
         Debug.Log("Refreshing dialogue UI");
         if (dialogueIsPlaying)
         {
-            // Re-display the current content to update the choices
-            //DisplayChoices();
-            
-            // This should force the dialogue UI to refresh and show new choices
             ContinueStory();
         }
     }
@@ -265,24 +161,27 @@ public class DialogueManager : MonoBehaviour
 
     }
 
-    public void StartDialogue(string KnotName)
+    public void StartDialogue(NPC npc)
     {
         dialogueIsPlaying = true;
         dialoguePanel.SetActive(true);
 
-        // reset portrait, layout, and speaker
         displayNameText.text = "???";
 
-        // Freeze the player movement
+        // Setup the audio source
+        audioSource.pitch = npc.npcVoicePitch;
+
         if (playerController != null)
         {
             playerController.SetCanMove(false);
         }
 
-        currentStory.ChoosePathString(KnotName);
-
-        ContinueStory();
+        // Begin the dialogue process
+        currentStory = new Story(npc.inkJSONAsset.text);
+        currentStory.ChoosePathString(npc.KnotName);
+        StartCoroutine(TypeSentence(currentStory.Continue(), npc));
     }
+
 
     private IEnumerator ExitDialogueMode()
     {
@@ -365,25 +264,6 @@ public class DialogueManager : MonoBehaviour
         ContinueStory();
     }
 
-    private void StartQuest()
-    {
-        // Logic to start the quest, like updating a quest manager or dialogue manager
-        if (currentQuest != null)
-        {
-            currentQuest.isActive = true;
-            // Update quest UI and other related components
-            questLogPanel.SetActive(true);
-
-            // Assuming UpdateQuestUIOnStart is a method that takes a QuestManager as a parameter
-            UpdateQuestUIOnStart(currentQuest); // 'currentQuest' instead of 'quest'
-        }
-        else
-        {
-            Debug.LogError("No current quest is set.");
-        }
-    }
-
-
     private void HandleTags(List<string> currentTags)
     {
         foreach (string tag in currentTags)
@@ -445,22 +325,23 @@ public class DialogueManager : MonoBehaviour
 
 
 
-    private IEnumerator TypeSentence(string sentence)
+    private IEnumerator TypeSentence(string sentence, NPC npc)
     {
+        float typingSpeed = npc.npcTypingSpeed;
         isTyping = true;
         dialogueText.text = "";
-        float nextBeepTime = 0f; // Time when next beep should play
+        float nextBeepTime = 0f;
 
         foreach (char letter in sentence.ToCharArray())
         {
             dialogueText.text += letter;
-            if (Time.time >= nextBeepTime)
+            if (Time.time >= nextBeepTime && npc.voiceClips.Length > 0)
             {
                 if (voiceClips != null && voiceClips.Length > 0 && audioSource != null && !audioSource.isPlaying)
                 {
-                    AudioClip randomBeep = voiceClips[Random.Range(0, voiceClips.Length)];
+                    AudioClip randomBeep = npc.voiceClips[Random.Range(0, npc.voiceClips.Length)];
                     audioSource.PlayOneShot(randomBeep);
-                    nextBeepTime = Time.time + beepFrequency;
+                    nextBeepTime = Time.time + npc.npcBeepFrequency;
                 }
             }
             yield return new WaitForSeconds(typingSpeed);

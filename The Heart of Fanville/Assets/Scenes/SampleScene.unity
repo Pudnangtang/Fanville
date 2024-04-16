@@ -1884,7 +1884,7 @@ MonoBehaviour:
   visualCue: {fileID: 468807287}
   inkJSON: {fileID: 4900000, guid: 24042a74da537d04b8156b613f460444, type: 3}
   KnotName: DinoFirstText
-  npcTypingSpeed: 0.2
+  npcTypingSpeed: 1
   npcVoicePitch: 3
   npcBeepFrequency: 0.4
   questTitle: 
@@ -2087,7 +2087,7 @@ MonoBehaviour:
   choiceButtons:
   - {fileID: 1107258525}
   - {fileID: 1107258524}
-  typingSpeed: 0.05
+  typingSpeed: 0
   audioSource: {fileID: 1932410960}
   voiceClips:
   - {fileID: 8300000, guid: 68692c88df06b0a4aaf86b88a9734c66, type: 3}

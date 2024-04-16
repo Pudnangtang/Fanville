@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
 public class QuestManager : MonoBehaviour
 {
@@ -21,6 +22,7 @@ public class QuestManager : MonoBehaviour
     public delegate void QuestAction(QuestManager quest);
     public event QuestAction OnQuestStarted;
     public event QuestAction OnQuestCompleted;
+    public QuestManager currentQuest;
 
     void Start()
     {
@@ -49,16 +51,38 @@ public class QuestManager : MonoBehaviour
         OnQuestStarted?.Invoke(this);
     }
 
+    private void UpdateQuestUIOnCompletion(QuestManager quest)
+    {
+        if (questTitleText == null || questDescriptionText == null || questLogPanel == null)
+        {
+            Debug.LogError("Quest UI components are not assigned!");
+            return;
+        }
+
+        // Optionally, update the text to indicate completion
+        questTitleText.text = "Quest Completed: " + quest.title;
+        questDescriptionText.text = "You have successfully completed the quest.";
+
+        //hide the quest log panel after some time
+        StartCoroutine(HideQuestLogAfterDelay());
+    }
+
+    private IEnumerator HideQuestLogAfterDelay()
+    {
+        // Wait for a few seconds before hiding the quest log panel
+        yield return new WaitForSeconds(5.0f);
+        questLogPanel.SetActive(false);
+    }
+
     // Call this method when the player completes the quest
     public void CompleteQuest()
     {
-        isActive = false;
-        isCompleted = true;
-
-        questLogPanel.SetActive(false);
-
-        OnQuestCompleted?.Invoke(this);
+        if (currentQuest != null && !currentQuest.isCompleted)
+        {
+            currentQuest.CompleteQuest();
+            Debug.Log("Quest Complete");
+            UpdateQuestUIOnCompletion(currentQuest);
+            // Additional logic for when the quest is completed
+        }
     }
-
-    // Additional quest-related methods can be added here
 }

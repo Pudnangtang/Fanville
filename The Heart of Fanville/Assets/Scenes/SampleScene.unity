@@ -176,6 +176,12 @@ MonoBehaviour:
   questTitleText: {fileID: 150239806}
   questDescriptionText: {fileID: 150239805}
   currentQuest: {fileID: 15729447}
+--- !u!1 &115597015 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 210312868953903751, guid: b7237ddafccc6e24a8700c019466bfd0,
+    type: 3}
+  m_PrefabInstance: {fileID: 1107258522}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &148267829
 GameObject:
   m_ObjectHideFlags: 0
@@ -1429,42 +1435,6 @@ PrefabInstance:
       addedObject: {fileID: 150239804}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b7237ddafccc6e24a8700c019466bfd0, type: 3}
---- !u!114 &1107258523 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1128064912196478403, guid: b7237ddafccc6e24a8700c019466bfd0,
-    type: 3}
-  m_PrefabInstance: {fileID: 1107258522}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1107258524 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7541826024032725919, guid: b7237ddafccc6e24a8700c019466bfd0,
-    type: 3}
-  m_PrefabInstance: {fileID: 1107258522}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1107258525 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1490832282930997672, guid: b7237ddafccc6e24a8700c019466bfd0,
-    type: 3}
-  m_PrefabInstance: {fileID: 1107258522}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1107258526 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4091462933465190617, guid: b7237ddafccc6e24a8700c019466bfd0,
@@ -1601,7 +1571,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a5c325fe3f3c78428039ebdde953fb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collectableName: hasVeggies
 --- !u!1 &1361068995
 GameObject:
   m_ObjectHideFlags: 0
@@ -1742,6 +1711,12 @@ Transform:
   - {fileID: 177970394}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 20, y: 0, z: 0}
+--- !u!1 &1478810930 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7596074199272766144, guid: b7237ddafccc6e24a8700c019466bfd0,
+    type: 3}
+  m_PrefabInstance: {fileID: 1107258522}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1525724725
 GameObject:
   m_ObjectHideFlags: 0
@@ -1828,7 +1803,6 @@ GameObject:
   - component: {fileID: 1615645505}
   - component: {fileID: 1615645506}
   - component: {fileID: 1615645507}
-  - component: {fileID: 1615645508}
   m_Layer: 0
   m_Name: DialogueTrigger
   m_TagString: Untagged
@@ -1885,28 +1859,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   visualCue: {fileID: 468807287}
-  npc: {fileID: 1615645508}
---- !u!114 &1615645508
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1615645504}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3aa5caa5fab22ba4cbb178b1154748e1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dialogueManager: {fileID: 1932410959}
-  npcTypingSpeed: 0.05
-  npcVoicePitch: 1
-  npcBeepFrequency: 1
-  audioSource: {fileID: 1923378748}
-  voiceClips:
-  - {fileID: 8300000, guid: 68692c88df06b0a4aaf86b88a9734c66, type: 3}
-  inkJSONAsset: {fileID: 4900000, guid: 24042a74da537d04b8156b613f460444, type: 3}
-  KnotName: DinoFirstText
+  inkJSON: {fileID: 4900000, guid: 24042a74da537d04b8156b613f460444, type: 3}
 --- !u!1 &1621427527
 GameObject:
   m_ObjectHideFlags: 0
@@ -2023,7 +1976,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1923378747}
-  - component: {fileID: 1923378748}
   m_Layer: 0
   m_Name: NPC
   m_TagString: Untagged
@@ -2040,7 +1992,7 @@ Transform:
   m_GameObject: {fileID: 1923378746}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.17, y: 0.97, z: 0}
+  m_LocalPosition: {x: -8.55, y: 0.97, z: -8.49}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2049,102 +2001,6 @@ Transform:
   - {fileID: 468807288}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!82 &1923378748
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1923378746}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 1
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!1 &1932410957
 GameObject:
   m_ObjectHideFlags: 0
@@ -2191,15 +2047,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dialoguePanel: {fileID: 1107258527}
   dialogueText: {fileID: 1107258526}
-  displayNameText: {fileID: 1107258523}
-  audioSource: {fileID: 1923378748}
-  choiceButtons:
-  - {fileID: 1107258525}
-  - {fileID: 1107258524}
-  choices: []
-  playerController: {fileID: 148267830}
-  questManager: {fileID: 15729447}
-  ifSetUpStory: 0
+  choices:
+  - {fileID: 115597015}
+  - {fileID: 1478810930}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

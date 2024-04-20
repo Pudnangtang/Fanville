@@ -1,7 +1,7 @@
 using UnityEngine;
 using Ink.Runtime;
 
-public class Collectable : MonoBehaviour
+/*public class Collectable : MonoBehaviour
 {
     public string collectableName; // The name of the collectable item in Ink
 
@@ -38,4 +38,4 @@ public class Collectable : MonoBehaviour
         }
     }
 }
-
+*/

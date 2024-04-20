@@ -30,7 +30,7 @@ public class DialogueManager : MonoBehaviour
     private const string SPEAKER_TAG = "speaker";
 
     private Story currentStory;
-
+    private float typingSpeed;
     [SerializeField] private AudioSource audioSource;
     public bool dialogueIsPlaying { get; private set; }
 
@@ -39,6 +39,7 @@ public class DialogueManager : MonoBehaviour
     private bool isWaitingForChoiceToBeMade = false;
 
     private static DialogueManager instance;
+    //private float beepFrequency;
 
     private void Awake()
     {
@@ -65,7 +66,7 @@ public class DialogueManager : MonoBehaviour
         dialogueIsPlaying = false;
         dialoguePanel.SetActive(false);
 
-        SetUpStory(inkJSONAsset,typingSpeed, voicePitch,beepFrequency);
+        SetUpStory(inkJSONAsset,typingSpeed,voicePitch,beepFrequency);
 
         if (choiceButtons == null)
         {
@@ -349,9 +350,6 @@ public class DialogueManager : MonoBehaviour
         isTyping = false;
     }
 
-
-
-
     private void CompleteSentence()
     {
         if (typingCoroutine != null)
@@ -400,7 +398,6 @@ public class DialogueManager : MonoBehaviour
             }
         }
     }
-
 
     private IEnumerator SelectFirstChoice()
     {

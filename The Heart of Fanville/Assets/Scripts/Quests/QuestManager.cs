@@ -5,6 +5,8 @@ using System.Collections;
 
 public class QuestManager : MonoBehaviour
 {
+    [SerializeField] public DialogueManager dialogueManager;
+
     [Header("Quest Data")]
     public string title;
     public string description;

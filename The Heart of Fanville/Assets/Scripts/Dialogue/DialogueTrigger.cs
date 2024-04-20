@@ -9,7 +9,6 @@ public class DialogueTrigger : MonoBehaviour
 
     [Header("Ink JSON")]
     [SerializeField] private TextAsset inkJSON;
-    [SerializeField] private string KnotName;
 
     private bool playerInRange;
 

@@ -26,13 +26,30 @@ public class QuestManager : MonoBehaviour
     public event QuestAction OnQuestCompleted;
     public QuestManager currentQuest;
 
+    private static QuestManager instance;
+
+    public static QuestManager GetInstance()
+    {
+        return instance;
+    }
+
+    private void Awake()
+    {
+        if (instance != null)
+        {
+            Debug.LogWarning("Multiple instances of QuestManager found!");
+            return;
+        }
+        instance = this;
+    }
+
     void Start()
     {
         questLogPanel.SetActive(false);
     }
 
     // Call this method to start the quest
-    public void ActivateQuest(string questTitle)
+    public void ActivateQuest()
     {
         Debug.Log($"Activating quest: {title}");
 
@@ -84,7 +101,6 @@ public class QuestManager : MonoBehaviour
             currentQuest.CompleteQuest();
             Debug.Log("Quest Complete");
             UpdateQuestUIOnCompletion(currentQuest);
-            // Additional logic for when the quest is completed
         }
     }
 }

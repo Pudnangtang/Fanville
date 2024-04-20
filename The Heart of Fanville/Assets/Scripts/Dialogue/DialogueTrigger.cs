@@ -9,6 +9,9 @@ public class DialogueTrigger : MonoBehaviour
 
     [Header("Ink JSON")]
     [SerializeField] private TextAsset inkJSON;
+    
+    [Header("NPC Script")]
+    private NPC npc;
 
     private bool playerInRange;
 
@@ -26,22 +29,20 @@ public class DialogueTrigger : MonoBehaviour
 
     private void HandlePlayerInput()
     {
-        if (playerInRange && !DialogueManager.GetInstance().dialogueIsPlaying)
+        if (npc.playerInRange && !DialogueManager.GetInstance().dialogueIsPlaying)
         {
             visualCue.SetActive(true);
-
             if (Input.GetKeyDown(KeyCode.E))
             {
                 if (!DialogueManager.GetInstance().ifSetUpStory)
                 {
-                    DialogueManager.GetInstance().SetUpStory(inkJSON, npcTypingSpeed, npcVoicePitch, npcBeepFrequency);
+                    // Use NPC's settings to setup the story
+                    DialogueManager.GetInstance().SetUpStory(npc.inkJSONAsset, npc.npcTypingSpeed, npc.npcVoicePitch, npc.npcBeepFrequency);
                     DialogueManager.GetInstance().ifSetUpStory = true;
                 }
 
-                // Start the dialogue
-                TriggerDialogue();
-
-                // Do not activate the quest here; it should be activated within the dialogue at the right moment 
+                // Start the dialogue using NPC's method
+                npc.TriggerDialogue();
             }
         }
         else

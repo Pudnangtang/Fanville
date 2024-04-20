@@ -21,6 +21,8 @@ public class NPC : MonoBehaviour
     [Header("NPC Knot Start")]
     [SerializeField] public string KnotName;
 
+    public bool playerInRange = false;  // Track if player is in range
+
     // This function is called by the DialogueTrigger
     public void TriggerDialogue()
     {

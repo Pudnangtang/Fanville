@@ -16,10 +16,12 @@ public class DialogueManager : MonoBehaviour
 
     [Header("Choices UI")]
     [SerializeField] private Button[] choiceButtons;
+    [SerializeField] private GameObject[] choices;
     private TextMeshProUGUI[] choicesText;
 
     [Header("Typing Effect")]
     private Coroutine typingCoroutine;
+    private float typingSpeed;
 
     [Header("Player Controls")]
     [SerializeField] private PlayerController playerController;
@@ -28,6 +30,7 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private QuestManager questManager;
 
     public bool ifSetUpStory = false;
+    
     private const string SPEAKER_TAG = "speaker";
 
     private Story currentStory;
@@ -45,13 +48,6 @@ public class DialogueManager : MonoBehaviour
             return;
         }
         instance = this;
-
-        choicesText = new TextMeshProUGUI[choiceButtons.Length];
-        for (int i = 0; i < choiceButtons.Length; i++)
-        {
-            int index = i;
-            choiceButtons[i].onClick.AddListener(() => MakeChoice(index));
-        }
     }
 
     public static DialogueManager GetInstance()
@@ -74,12 +70,12 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        choicesText = new TextMeshProUGUI[choiceButtons.Length];
-        for (int i = 0; i < choiceButtons.Length; i++)
+        choicesText = new TextMeshProUGUI[choices.Length];
+        int index = 0;
+        foreach (GameObject choice in choices)
         {
-            int localIndex = i;
-            choiceButtons[i].onClick.AddListener(() => MakeChoice(localIndex));
-            choicesText[i] = choiceButtons[i].GetComponentInChildren<TextMeshProUGUI>();
+            choicesText[index] = choice.GetComponentInChildren<TextMeshProUGUI>();
+            index++;
         }
     }
 
@@ -107,7 +103,7 @@ public class DialogueManager : MonoBehaviour
 
         if (isWaitingForChoiceToBeMade && Input.GetKeyDown(KeyCode.Return))
         {
-            MakeChoice(0);
+            ContinueStory();
         }
     }
 
@@ -192,7 +188,7 @@ public class DialogueManager : MonoBehaviour
 
         if (currentStory.currentTags.Contains("start_quest"))
         {
-            ActivateQuest();
+            QuestManager.GetInstance().ActivateQuest();
         }
 
         if (choice.tags != null && choice.tags.Count > 0)
@@ -201,17 +197,18 @@ public class DialogueManager : MonoBehaviour
             {
                 if (tag.Equals("start_quest"))
                 {
-                    ActivateQuest();
+                    QuestManager.GetInstance().ActivateQuest();
                 }
                 else if (tag.Equals("complete_quest"))
                 {
-                    CompleteQuest();
+                    QuestManager.GetInstance().CompleteQuest();
                 }
             }
         }
 
         ContinueStory();
     }
+
 
     private void HandleTags(List<string> currentTags)
     {
@@ -250,9 +247,9 @@ public class DialogueManager : MonoBehaviour
 
     private void StartQuest(string questTitle)
     {
-        if (questManager != null)
+        if (questManager != null && questManager.currentQuest != null && questManager.currentQuest.title == questTitle)
         {
-            questManager.ActivateQuest(questTitle, "Quest description for: " + questTitle);
+            questManager.ActivateQuest();
         }
         else
         {
@@ -280,6 +277,43 @@ public class DialogueManager : MonoBehaviour
             dialogueText.text += letter;
             yield return new WaitForSeconds(1.0f / typingSpeed); // Typing speed affects delay
         }
+    }
+
+    private void DisplayChoices()
+    {
+        List<Choice> currentChoices = currentStory.currentChoices;
+
+        // defensive check to make sure our UI can support the number of choices coming in
+        if (currentChoices.Count > choices.Length)
+        {
+            Debug.LogError("More choices were given than the UI can support. Number of choices given: "
+                + currentChoices.Count);
+        }
+
+        int index = 0;
+        // enable and initialize the choices up to the amount of choices for this line of dialogue
+        foreach (Choice choice in currentChoices)
+        {
+            choices[index].gameObject.SetActive(true);
+            choicesText[index].text = choice.text;
+            index++;
+        }
+        // go through the remaining choices the UI supports and make sure they're hidden
+        for (int i = index; i < choices.Length; i++)
+        {
+            choices[i].gameObject.SetActive(false);
+        }
+
+        StartCoroutine(SelectFirstChoice());
+    }
+
+    private IEnumerator SelectFirstChoice()
+    {
+        // Event System requires we clear it first, then wait
+        // for at least one frame before we set the current selected object.
+        EventSystem.current.SetSelectedGameObject(null);
+        yield return new WaitForEndOfFrame();
+        EventSystem.current.SetSelectedGameObject(choices[0].gameObject);
     }
 
     private void CompleteSentence()

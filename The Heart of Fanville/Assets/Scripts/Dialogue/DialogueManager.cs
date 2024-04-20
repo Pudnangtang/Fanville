@@ -313,8 +313,18 @@ public class DialogueManager : MonoBehaviour
         // for at least one frame before we set the current selected object.
         EventSystem.current.SetSelectedGameObject(null);
         yield return new WaitForEndOfFrame();
-        EventSystem.current.SetSelectedGameObject(choices[0].gameObject);
+
+        // Only try to select the first choice if there is one
+        if (choices.Length > 0 && choices[0].gameObject.activeInHierarchy)
+        {
+            EventSystem.current.SetSelectedGameObject(choices[0].gameObject);
+        }
+        else
+        {
+            Debug.LogWarning("No choices to select.");
+        }
     }
+
 
     private void CompleteSentence()
     {

@@ -167,13 +167,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cded7f1aafa2164fa83206503eff6a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  title: 
-  description: 
+  dialogueManager: {fileID: 1932410959}
+  title: Title of quest WOMP
+  description: Get the wiomps!
   isActive: 0
   isCompleted: 0
   questLogPanel: {fileID: 150239807}
   questTitleText: {fileID: 150239806}
   questDescriptionText: {fileID: 150239805}
+  currentQuest: {fileID: 15729447}
 --- !u!1 &148267829
 GameObject:
   m_ObjectHideFlags: 0
@@ -1826,6 +1828,7 @@ GameObject:
   - component: {fileID: 1615645505}
   - component: {fileID: 1615645506}
   - component: {fileID: 1615645507}
+  - component: {fileID: 1615645508}
   m_Layer: 0
   m_Name: DialogueTrigger
   m_TagString: Untagged
@@ -1882,14 +1885,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   visualCue: {fileID: 468807287}
-  inkJSON: {fileID: 4900000, guid: 24042a74da537d04b8156b613f460444, type: 3}
+  npc: {fileID: 1615645508}
+--- !u!114 &1615645508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1615645504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3aa5caa5fab22ba4cbb178b1154748e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dialogueManager: {fileID: 1932410959}
+  npcTypingSpeed: 0.05
+  npcVoicePitch: 1
+  npcBeepFrequency: 1
+  audioSource: {fileID: 1923378748}
+  voiceClips:
+  - {fileID: 8300000, guid: 68692c88df06b0a4aaf86b88a9734c66, type: 3}
+  inkJSONAsset: {fileID: 4900000, guid: 24042a74da537d04b8156b613f460444, type: 3}
   KnotName: DinoFirstText
-  npcTypingSpeed: 1
-  npcVoicePitch: 3
-  npcBeepFrequency: 0.4
-  questTitle: 
-  questDescription: 
-  questToStart: {fileID: 0}
 --- !u!1 &1621427527
 GameObject:
   m_ObjectHideFlags: 0
@@ -2006,6 +2023,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1923378747}
+  - component: {fileID: 1923378748}
   m_Layer: 0
   m_Name: NPC
   m_TagString: Untagged
@@ -2031,80 +2049,13 @@ Transform:
   - {fileID: 468807288}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1932410957
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1932410958}
-  - component: {fileID: 1932410959}
-  - component: {fileID: 1932410960}
-  m_Layer: 0
-  m_Name: DialogueManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1932410958
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1932410957}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1068874224}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1932410959
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1932410957}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56f1e4ed43ecece4cbd2450975d94593, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dialoguePanel: {fileID: 1107258527}
-  dialogueText: {fileID: 1107258526}
-  displayNameText: {fileID: 1107258523}
-  questTitle: womp womp
-  questDescription: find the womps
-  questTitleText: {fileID: 150239806}
-  questDescriptionText: {fileID: 150239805}
-  questLogPanel: {fileID: 150239807}
-  choiceButtons:
-  - {fileID: 1107258525}
-  - {fileID: 1107258524}
-  typingSpeed: 0
-  audioSource: {fileID: 1932410960}
-  voiceClips:
-  - {fileID: 8300000, guid: 68692c88df06b0a4aaf86b88a9734c66, type: 3}
-  voicePitch: 1
-  beepFrequency: 1
-  playerController: {fileID: 148267830}
-  inkJSONAsset: {fileID: 0}
-  stopAudioSource: 0
-  currentQuest: {fileID: 0}
-  ifSetUpStory: 0
---- !u!82 &1932410960
+--- !u!82 &1923378748
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1932410957}
+  m_GameObject: {fileID: 1923378746}
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
@@ -2194,6 +2145,61 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1 &1932410957
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1932410958}
+  - component: {fileID: 1932410959}
+  m_Layer: 0
+  m_Name: DialogueManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1932410958
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1932410957}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1068874224}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1932410959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1932410957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56f1e4ed43ecece4cbd2450975d94593, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dialoguePanel: {fileID: 1107258527}
+  dialogueText: {fileID: 1107258526}
+  displayNameText: {fileID: 1107258523}
+  audioSource: {fileID: 1923378748}
+  choiceButtons:
+  - {fileID: 1107258525}
+  - {fileID: 1107258524}
+  choices: []
+  playerController: {fileID: 148267830}
+  questManager: {fileID: 15729447}
+  ifSetUpStory: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

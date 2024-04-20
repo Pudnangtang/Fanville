@@ -6,12 +6,9 @@ public class DialogueTrigger : MonoBehaviour
 {
     [Header("Visual Cue")]
     [SerializeField] private GameObject visualCue;
-
-    [Header("Ink JSON")]
-    [SerializeField] private TextAsset inkJSON;
     
     [Header("NPC Script")]
-    private NPC npc;
+    [SerializeField] private NPC npc;
 
     private bool playerInRange;
 
@@ -19,9 +16,18 @@ public class DialogueTrigger : MonoBehaviour
     {
         playerInRange = false;
         visualCue.SetActive(false);
+        npc = GetComponent<NPC>();  // If NPC script is on the same GameObject
+        if (npc == null)
+        {
+            npc = GetComponentInChildren<NPC>();  // If NPC script is on a child GameObject
+        }
+        if (npc == null)
+        {
+            Debug.LogError("NPC component not found on the GameObject or its children");
+        }
     }
 
-    private void Update()
+        private void Update()
     {
         HandlePlayerInput();
     }
@@ -29,19 +35,37 @@ public class DialogueTrigger : MonoBehaviour
 
     private void HandlePlayerInput()
     {
-        if (npc.playerInRange && !DialogueManager.GetInstance().dialogueIsPlaying)
+        if (playerInRange)
         {
             visualCue.SetActive(true);
-            if (Input.GetKeyDown(KeyCode.E))
+
+            DialogueManager dialogueManager = DialogueManager.GetInstance();
+            if (dialogueManager == null)
             {
-                if (!DialogueManager.GetInstance().ifSetUpStory)
+                Debug.LogError("DialogueManager instance is null");
+                return; // Stop further processing since DialogueManager is required.
+            }
+
+            if (!dialogueManager.dialogueIsPlaying && Input.GetKeyDown(KeyCode.E))
+            {
+                if (!dialogueManager.ifSetUpStory)
                 {
-                    // Use NPC's settings to setup the story
-                    DialogueManager.GetInstance().SetUpStory(npc.inkJSONAsset, npc.npcTypingSpeed, npc.npcVoicePitch, npc.npcBeepFrequency);
-                    DialogueManager.GetInstance().ifSetUpStory = true;
+                    // Here, check if npc or any of its properties are null
+                    if (npc == null)
+                    {
+                        Debug.LogError("NPC reference is null");
+                        return; // Stop further processing since NPC is required.
+                    }
+                    if (npc.inkJSONAsset == null)
+                    {
+                        Debug.LogError("NPC Ink JSON Asset is not assigned");
+                        return; // Stop further processing since Ink JSON Asset is required.
+                    }
+
+                    dialogueManager.SetUpStory(npc.inkJSONAsset, npc.npcTypingSpeed, npc.npcVoicePitch, npc.npcBeepFrequency);
+                    dialogueManager.ifSetUpStory = true;
                 }
 
-                // Start the dialogue using NPC's method
                 npc.TriggerDialogue();
             }
         }
@@ -52,11 +76,14 @@ public class DialogueTrigger : MonoBehaviour
     }
 
 
+
     private void OnTriggerEnter(Collider collider)
     {
         if (collider.gameObject.CompareTag("Player"))
         {
             playerInRange = true;
+            //visualCue.SetActive(true);
+            Debug.Log("Player entered NPC range.");
         }
     }
 
@@ -65,6 +92,8 @@ public class DialogueTrigger : MonoBehaviour
         if (collider.gameObject.CompareTag("Player"))
         {
             playerInRange = false;
+            //visualCue.SetActive(false);
+            Debug.Log("Player exited NPC range.");
         }
     }
 

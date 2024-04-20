@@ -32,7 +32,7 @@ public class QuestManager : MonoBehaviour
     }
 
     // Call this method to start the quest
-    public void ActivateQuest()
+    public void ActivateQuest(string questTitle)
     {
         Debug.Log($"Activating quest: {title}");
 

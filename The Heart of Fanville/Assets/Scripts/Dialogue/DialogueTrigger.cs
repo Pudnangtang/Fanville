@@ -39,10 +39,9 @@ public class DialogueTrigger : MonoBehaviour
                 }
 
                 // Start the dialogue
-                NPC.GetInstance().NPC(KnotName);
+                TriggerDialogue();
 
-
-                // Do not activate the quest here; it should be activated within the dialogue at the right momement 
+                // Do not activate the quest here; it should be activated within the dialogue at the right moment 
             }
         }
         else

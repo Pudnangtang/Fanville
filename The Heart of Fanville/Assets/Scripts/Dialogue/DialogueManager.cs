@@ -12,6 +12,7 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private GameObject dialoguePanel;
     [SerializeField] private TextMeshProUGUI dialogueText;
     [SerializeField] private TextMeshProUGUI displayNameText;
+    [SerializeField] private AudioSource audioSource;
 
     [Header("Choices UI")]
     [SerializeField] private Button[] choiceButtons;
@@ -23,23 +24,18 @@ public class DialogueManager : MonoBehaviour
     [Header("Player Controls")]
     [SerializeField] private PlayerController playerController;
 
-    [SerializeField] private bool stopAudioSource;
+    [Header("Quest Management")]
+    [SerializeField] private QuestManager questManager;
 
-    public bool ifSetUpStory = false;  // To determine if the story is set up or not
-
+    public bool ifSetUpStory = false;
     private const string SPEAKER_TAG = "speaker";
 
     private Story currentStory;
-    private float typingSpeed;
-    [SerializeField] private AudioSource audioSource;
+    private NPC currentNPC;
     public bool dialogueIsPlaying { get; private set; }
-
-    private bool isTyping; 
-
+    private bool isTyping;
     private bool isWaitingForChoiceToBeMade = false;
-
     private static DialogueManager instance;
-    //private float beepFrequency;
 
     private void Awake()
     {
@@ -49,6 +45,13 @@ public class DialogueManager : MonoBehaviour
             return;
         }
         instance = this;
+
+        choicesText = new TextMeshProUGUI[choiceButtons.Length];
+        for (int i = 0; i < choiceButtons.Length; i++)
+        {
+            int index = i;
+            choiceButtons[i].onClick.AddListener(() => MakeChoice(index));
+        }
     }
 
     public static DialogueManager GetInstance()
@@ -60,13 +63,10 @@ public class DialogueManager : MonoBehaviour
         return instance;
     }
 
-
     private void Start()
     {
         dialogueIsPlaying = false;
         dialoguePanel.SetActive(false);
-
-        SetUpStory(inkJSONAsset,typingSpeed,voicePitch,beepFrequency);
 
         if (choiceButtons == null)
         {
@@ -75,31 +75,23 @@ public class DialogueManager : MonoBehaviour
         }
 
         choicesText = new TextMeshProUGUI[choiceButtons.Length];
-
         for (int i = 0; i < choiceButtons.Length; i++)
         {
             int localIndex = i;
             choiceButtons[i].onClick.AddListener(() => MakeChoice(localIndex));
             choicesText[i] = choiceButtons[i].GetComponentInChildren<TextMeshProUGUI>();
         }
-
     }
-
 
     private void Update()
     {
-        Debug.Log($"Dialogue playing: {dialogueIsPlaying}, Waiting for choice: {isWaitingForChoiceToBeMade}");
         if (!dialogueIsPlaying)
         {
             return;
         }
 
-        // Use 'Space' key for continuing dialogue
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            Debug.Log("Space key pressed to continue dialogue");
-
-            // Check if the dialogue is not waiting for a choice to be made
             if (!isWaitingForChoiceToBeMade)
             {
                 if (isTyping)
@@ -113,14 +105,9 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
-        // Use 'Enter' key exclusively for making choices
         if (isWaitingForChoiceToBeMade && Input.GetKeyDown(KeyCode.Return))
         {
-            Debug.Log("Enter key pressed for choice");
-
-            // Implement your choice selection logic here.
-            // For example, select the first choice or a highlighted choice.
-            MakeChoice(0); // This is an example; modify as needed for your choice logic.
+            MakeChoice(0);
         }
     }
 
@@ -132,12 +119,10 @@ public class DialogueManager : MonoBehaviour
         }
         return currentStory;
     }
-  
-    // Call this to refresh the dialogue choices after an update in the story's state
+
     public void RefreshDialogueUI()
     {
-        Debug.Log("Refreshing dialogue UI");
-        if (dialogueIsPlaying)
+        if (currentStory.canContinue)
         {
             ContinueStory();
         }
@@ -151,45 +136,23 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        Debug.Log("Setting up Ink story");
         currentStory = new Story(inkJSON.text);
-
-        // Set the typing speed and voice pitch from the parameters
-        typingSpeed = npcTypingSpeed;
+        dialogueText.maxVisibleCharacters = 0;
         audioSource.pitch = npcVoicePitch;
-
-        beepFrequency = npcBeepFrequency;
-
     }
 
     public void StartDialogue(NPC npc)
     {
-        dialogueIsPlaying = true;
+        SetUpStory(npc.inkJSONAsset, npc.npcTypingSpeed, npc.npcVoicePitch, npc.npcBeepFrequency);
         dialoguePanel.SetActive(true);
-
-        displayNameText.text = "???";
-
-        // Setup the audio source
-        audioSource.pitch = npc.npcVoicePitch;
-
-        if (playerController != null)
-        {
-            playerController.SetCanMove(false);
-        }
-
-        // Begin the dialogue process
-        currentStory = new Story(npc.inkJSONAsset.text);
-        currentStory.ChoosePathString(npc.KnotName);
-        StartCoroutine(TypeSentence(currentStory.Continue(), npc));
+        dialogueIsPlaying = true;
+        RefreshDialogueUI();
     }
-
 
     private IEnumerator ExitDialogueMode()
     {
-        Debug.Log("Exiting Dialogue Mode...");
         yield return new WaitForSeconds(0.2f);
 
-        // Unfreeze the player movement
         if (playerController != null)
         {
             playerController.SetCanMove(true);
@@ -198,52 +161,38 @@ public class DialogueManager : MonoBehaviour
         dialogueIsPlaying = false;
         dialoguePanel.SetActive(false);
         dialogueText.text = "";
-        Debug.Log("Dialogue Mode Exited");
     }
-
 
     private void ContinueStory()
     {
-        // If the story can continue
         if (currentStory.canContinue)
         {
-            // Stop any ongoing typing coroutine
             if (typingCoroutine != null)
             {
                 StopCoroutine(typingCoroutine);
             }
-
-            // Start typing out the next line of dialogue
             typingCoroutine = StartCoroutine(TypeSentence(currentStory.Continue()));
-
-            // Display the choices if there are any
             DisplayChoices();
-            //handle tags
             HandleTags(currentStory.currentTags);
         }
-        // If the story can't continue but there are choices available
         else if (currentStory.currentChoices.Count > 0)
         {
             dialogueIsPlaying = true;
             DisplayChoices();
         }
-        // If the story can't continue and there are no choices available, exit dialogue mode
         else
         {
             StartCoroutine(ExitDialogueMode());
         }
     }
 
-    // Call this method when the player makes a choice in the dialogue
     public void OnMakeChoice(Choice choice)
     {
-        // Choose the choice index in the Ink story
         currentStory.ChooseChoiceIndex(choice.index);
 
-        // Check for tags associated with this choice
         if (currentStory.currentTags.Contains("start_quest"))
         {
-            StartQuest();
+            ActivateQuest();
         }
 
         if (choice.tags != null && choice.tags.Count > 0)
@@ -252,7 +201,7 @@ public class DialogueManager : MonoBehaviour
             {
                 if (tag.Equals("start_quest"))
                 {
-                    StartQuest();
+                    ActivateQuest();
                 }
                 else if (tag.Equals("complete_quest"))
                 {
@@ -261,7 +210,6 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
-        // Continue the story after making a choice
         ContinueStory();
     }
 
@@ -269,85 +217,69 @@ public class DialogueManager : MonoBehaviour
     {
         foreach (string tag in currentTags)
         {
-            // Log the tag we're handling
             Debug.Log("Handling tag: " + tag);
 
-            // If it's a simple tag without a colon, handle those cases first
-            if (tag.Equals("start_quest"))
+            string[] parts = tag.Split(':');
+            if (parts.Length == 2)
             {
-                StartQuest(currentQuest);
-                // Find the QuestManager component in the scene and start the quest
-                QuestManager questManager = FindObjectOfType<QuestManager>();
-                if (questManager != null)
-                {
-                    // Set the quest details from the dialogue manager to the quest manager
-                    questManager.title = questTitle;
-                    questManager.description = questDescription;
-                    questManager.ActivateQuest();
-                    currentQuest = questManager;
-                }
-                else
-                {
-                    Debug.LogError("QuestManager component not found in the scene.");
-                }
-                continue; // Skip the rest of the loop for this tag
-            }
-            else if (tag.Equals("complete_quest"))
-            {
-                // Complete the quest
-                CompleteQuest();
-                continue; // Skip the rest of the loop for this tag
-            }
+                string command = parts[0].Trim();
+                string value = parts[1].Trim();
 
-            // Handle tags with key-value pairs separated by a colon
-            string[] splitTag = tag.Split(':');
-            if (splitTag.Length == 2)
-            {
-                string tagKey = splitTag[0].Trim();
-                string tagValue = splitTag[1].Trim();
-
-                switch (tagKey)
+                switch (command)
                 {
+                    case "start_quest":
+                        StartQuest(value);
+                        break;
+                    case "complete_quest":
+                        CompleteQuest(value);
+                        break;
                     case SPEAKER_TAG:
-                        displayNameText.text = tagValue;
+                        displayNameText.text = value;
                         break;
                     default:
-                        Debug.LogWarning("Unhandled tag: " + tag);
+                        Debug.LogWarning($"Unhandled tag: {tag}");
                         break;
                 }
             }
             else
             {
-                // If the tag isn't a known single tag or a key-value pair, log an error
-                Debug.LogError("Tag format not recognized: " + tag);
+                Debug.LogError($"Tag format not recognized: {tag}");
             }
         }
     }
 
-
-
-    private IEnumerator TypeSentence(string sentence, NPC npc)
+    private void StartQuest(string questTitle)
     {
-        float typingSpeed = npc.npcTypingSpeed;
-        isTyping = true;
-        dialogueText.text = "";
-        float nextBeepTime = 0f;
+        if (questManager != null)
+        {
+            questManager.ActivateQuest(questTitle, "Quest description for: " + questTitle);
+        }
+        else
+        {
+            Debug.LogError("QuestManager component not assigned in DialogueManager.");
+        }
+    }
 
-        foreach (char letter in sentence.ToCharArray())
+    private void CompleteQuest(string questTitle)
+    {
+        if (questManager != null && questManager.currentQuest != null && questManager.currentQuest.title == questTitle)
+        {
+            questManager.CompleteQuest();
+        }
+        else
+        {
+            Debug.LogError("No such quest active or QuestManager is null.");
+        }
+    }
+
+    private IEnumerator TypeSentence(string sentence)
+    {
+        dialogueText.text = "";
+        foreach (char letter in sentence)
         {
             dialogueText.text += letter;
-            if (Time.time >= nextBeepTime && npc.voiceClips.Length > 0)
-            {
-                if (voiceClips != null && voiceClips.Length > 0 && audioSource != null && !audioSource.isPlaying)
-                {
-                    AudioClip randomBeep = npc.voiceClips[Random.Range(0, npc.voiceClips.Length)];
-                    audioSource.PlayOneShot(randomBeep);
-                    nextBeepTime = Time.time + npc.npcBeepFrequency;
-                }
-            }
-            yield return new WaitForSeconds(typingSpeed);
+            yield return new WaitForSeconds(1.0f / typingSpeed); // Typing speed affects delay
         }
-        isTyping = false;
     }
 
     private void CompleteSentence()
@@ -360,115 +292,5 @@ public class DialogueManager : MonoBehaviour
         dialogueText.text = currentStory.currentText; // Display full text immediately
         isTyping = false; // Update typing status
     }
-    private void DisplayChoices()
-    {
-        List<Choice> currentChoices = currentStory.currentChoices;
-
-        // Check if there are any choices to display.
-        isWaitingForChoiceToBeMade = currentChoices.Count > 0;
-
-        if (isWaitingForChoiceToBeMade)
-        {
-            Debug.Log("Choices available: " + currentChoices.Count);
-
-            // If there are choices, enable the choice UI and set the text for each one.
-            for (int i = 0; i < choiceButtons.Length; i++)
-            {
-                if (i < currentChoices.Count)
-                {
-                    choiceButtons[i].gameObject.SetActive(true); // Activate the button gameobject
-                    choicesText[i].text = currentChoices[i].text;
-                }
-                else
-                {
-                    // Disable any choice UI that is not needed.
-                    choiceButtons[i].gameObject.SetActive(false); // Deactivate the button gameobject
-                }
-            }
-
-            // Automatically select the first choice for better UX.
-            StartCoroutine(SelectFirstChoice());
-        }
-        else
-        {
-            // If no choices are present, make sure they are all disabled.
-            for (int i = 0; i < choiceButtons.Length; i++)
-            {
-                choiceButtons[i].gameObject.SetActive(false); // Deactivate the button gameobject
-            }
-        }
-    }
-
-    private IEnumerator SelectFirstChoice()
-    {
-        EventSystem.current.SetSelectedGameObject(null);
-        yield return new WaitForEndOfFrame();
-        EventSystem.current.SetSelectedGameObject(choiceButtons[0].gameObject);
-    }
-
-    public void MakeChoice(int choiceIndex)
-    {
-        if (currentStory == null)
-        {
-            Debug.LogError("currentStory is null.");
-            return;
-        }
-
-        if (currentStory.currentChoices == null)
-        {
-            Debug.LogError("currentChoices is null.");
-            return;
-        }
-
-        if (choiceIndex < 0 || choiceIndex >= currentStory.currentChoices.Count)
-        {
-            Debug.LogError($"choiceIndex {choiceIndex} is out of bounds.");
-            return;
-        }
-
-        Debug.Log("Choice made: " + choiceIndex);
-
-        Choice choice = currentStory.currentChoices[choiceIndex];
-        if (choice == null)
-        {
-            Debug.LogError($"Choice at index {choiceIndex} is null.");
-            return;
-        }
-
-        bool shouldContinue = true;
-
-        if (choice.tags != null && choice.tags.Count > 0)
-        {
-            foreach (string tag in choice.tags)
-            {
-                if (tag.Equals("start_quest"))
-                {
-                    // Assuming there's only one QuestManager in the scene attached to a GameObject.
-                    QuestManager questManager = FindObjectOfType<QuestManager>();
-                    if (questManager != null)
-                    {
-                        questManager.title = questTitle; // Set the title of the quest.
-                        questManager.description = questDescription; // Set the description of the quest.
-                        questManager.ActivateQuest();
-                        currentQuest = questManager;
-
-                    }
-                    else
-                    {
-                        Debug.LogError("QuestManager not found in the scene.");
-                    }
-                }
-            }
-        }
-
-        // Choose the choice index in the Ink story
-        currentStory.ChooseChoiceIndex(choiceIndex);
-
-        if (shouldContinue)
-        {
-            ContinueStory();
-        }
-    }
-
 
 }

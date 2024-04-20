@@ -21,4 +21,10 @@ public class NPC : MonoBehaviour
     [Header("NPC Knot Start")]
     [SerializeField] public string KnotName;
 
+    // This function is called by the DialogueTrigger
+    public void TriggerDialogue()
+    {
+        DialogueManager.GetInstance().StartDialogue(this);
+    }
+
 }

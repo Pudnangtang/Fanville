@@ -42,7 +42,7 @@ public class DialogueTrigger : MonoBehaviour
         }
     }
 
-    private void OnTriggerExit (Collider collider)
+    private void OnTriggerExit(Collider collider)
     {
         if (collider.gameObject.tag == "Player")
         {
